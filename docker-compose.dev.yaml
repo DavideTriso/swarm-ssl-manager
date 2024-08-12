@@ -1,0 +1,63 @@
+services:
+
+
+  db:
+    image: mongo:7
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==${DB_NODE_ROLE}"
+    ports:
+      - ${DB_PORT}:27017
+      - 27017
+    volumes:
+      - db_data:/data/db
+    networks:
+        - network
+    hostname: db
+    command: --replSet rs0
+
+  manager:
+    image: davidetriso/symfony:php-8.3-fpm
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.role==${MANAGER_NODE_ROLE}"
+    user: 1000:1000
+    env_file:
+      - ./docker/dev/env/.env.manager
+    volumes:
+      - ./app:/var/www/html/:rw
+      - ./docker/dev/config/manager/usr/local/etc/php/conf.d/999-custom-php.ini:/usr/local/etc/php/conf.d/999-custom-php.ini:ro
+      - ${WATCH_DIR}:/var/www/watch-dir:ro
+    networks:
+        - network
+    hostname: manager
+    ports:
+      - 9000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - db
+
+  schedule_runner:
+    image: davidetriso/symfony:php-8.3-cron
+    user: 1000:1000
+    env_file:
+      - ./docker/dev/env/.env.manager
+    volumes:
+      - ./app:/var/www/html/:rw
+      - ./docker/dev/config/schedule_runner/etc/periodic/:/etc/periodic/:rw
+      - ./docker/dev/config/manager/usr/local/etc/php/conf.d/999-custom-php.ini:/usr/local/etc/php/conf.d/999-custom-php.ini:ro
+      - ${WATCH_DIR}:/var/www/watch-dir:ro
+    networks:
+        - network
+    hostname: schedule_runner
+
+volumes:
+  db_data:
+
+networks:
+  network:
+    name: ${NETWORK_NAME}
+    

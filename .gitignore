@@ -1,0 +1,41 @@
+
+###> symfony/framework-bundle ###
+/app/.env.local
+/app/.env.local.php
+/app/.env.*.local
+/app/config/secrets/prod/prod.decrypt.private.php
+/app//public/bundles/
+/app/var/
+/app/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/app/phpunit.xml
+/app/.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> IDE / Editor
+.vscode
+###< IDE / Editor
+
+
+###> Other ###
+.DS_Store
+*.local
+###< Other ###
+
+###> composer ###
+/app/.composer
+###< composer ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+###> infrastructrue ###
+/docker/dev/env/*
+!/docker/dev/env/.env.*.example
+###< infrastructrue ###
+
+/app/tmp/*
+!/app/tmp/.gitkeep
